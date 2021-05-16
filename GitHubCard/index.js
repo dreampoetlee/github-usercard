@@ -3,6 +3,17 @@
     (replacing the placeholder with your Github name):
     https://api.github.com/users/<your name>
 */
+axios
+  .get('https://api.github.com/users/dreampoetlee')
+  .then(response => {
+    const userInfo = userData(response.data);
+    const cards = document.querySelector('.cards');
+    cards.appendChild(userInfo);
+    console.log(response.data);
+  })
+  .catch(err => {
+    console.log(`error received ${err}`);
+  })
 
 /*
   STEP 2: Inspect and study the data coming back, this is YOUR
@@ -29,7 +40,20 @@
 */
 
 const followersArray = [];
+axios
+  .get('https://api.github.com/users/dreampoetlee/followers')
+  .then(response => {
+    const friendsArray = response.data;
 
+    friendsArray.forEach((item) => {
+      followersArray.push(item.login)
+    })
+    console.log(friendsArray);
+    grabData(followersArray);
+  })
+  .catch(err => {
+    console.log(`error received ${err}`);
+  });
 /*
   STEP 3: Create a function that accepts a single object as its only argument.
     Using DOM methods and properties, create and return the following markup:
@@ -49,6 +73,64 @@ const followersArray = [];
       </div>
     </div>
 */
+function grabData(array) {
+  array.forEach((item) => {
+    axios
+      .get(`https://api.github.com/users/${item}`)
+      .then(response => {
+        const userInfo = userData(response.data);
+        const card = document.querySelector('.cards');
+        cards.append(userInfo);
+      })
+      .catch(err => {
+        console.log(`error received &{err}`);
+      });
+  });
+};
+
+// grabData(followersArrary);
+
+function userData(User) {
+  let user =  document.createElement('div');
+  user.classList.add('card');
+
+  let userImg = document.createElement('img');
+  let cardInfo =  document.createElement('div');
+  cardInfo.classList.add('card-info');
+
+  let name = document.createElement('h3');
+  name.classList.add('name');
+
+  let userName =  document.createElement('p');
+  userName.classList.add('username');
+
+  let location = document.createElement('p');
+  let profile =  document.createElement('p');
+
+  let profileLink = document.createElement('a');
+  let followers = document.createElement('p');
+
+  let following = document.createElement('p');
+  let bio = document.createElement('p');
+
+  userImg.src = User.avatar_url;
+  name.textContent = User.name;
+  userName.textContent = User.login;
+
+  location.textContent = `Location: ${User.location}`;
+  profile.textContent = 'Profile: ';
+  profileLink.textContent = User.html_url;
+
+  followers.textContent = `Followers: ${User.followers}`;
+  following.textContent = `Following: ${User.following}`;
+  bio.textContent = `Bio: ${User.bio}`;
+
+  user.append(userImg, cardInfo);
+  cardInfo.append(name, userName, location, profile, profileLink, followers, following, bio);
+  profile.append(profileLink);
+
+  return user
+}
 
 /*
   List of LS Instructors Github username's:
